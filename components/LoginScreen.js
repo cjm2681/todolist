@@ -20,7 +20,7 @@ export default function LoginScreen({ navigation }) {
         })
         .then((response) => {
           Alert.alert('성공', '로그인에 성공하였습니다.');
-          navigation.navigate('Calendar');  // <-- 로그인 성공 후 CalendarScreen으로 이동합니다.
+          navigation.navigate('Calendar'); 
         })
         .catch((error) => {
           if (error.response) {
