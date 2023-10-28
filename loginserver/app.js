@@ -1,43 +1,42 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const mysql = require('mysql2');
-const session = require('express-session');
-const MySQLStore = require('express-mysql-session')(session);
-const cors = require('cors');
+const express = require('express'); // Express 프레임워크 모듈을 불러옵니다.
+const bodyParser = require('body-parser'); // 요청 바디를 파싱하기 위한 body-parser 모듈을 불러옵니다.
+const mysql = require('mysql2'); // MySQL 연결을 위한 mysql2 모듈을 불러옵니다.
+const session = require('express-session'); // 세션 사용을 위한 express-session 모듈을 불러옵니다.
+const MySQLStore = require('express-mysql-session')(session); // MySQL을 이용한 세션 스토어를 설정하기 위한 express-mysql-session 모듈을 불러옵니다.
+const cors = require('cors'); // Cross-Origin Resource Sharing(CORS) 처리를 위한 cors 모듈을 불러옵니다.
 
-const app = express();
-app.use(cors());
+const app = express(); // Express 애플리케이션을 생성합니다.
+app.use(cors()); // CORS 미들웨어를 적용합니다.
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-
+app.use(bodyParser.urlencoded({ extended: true })); // URL 인코딩된 요청 바디를 파싱합니다.
+app.use(bodyParser.json()); // JSON 형식의 요청 바디를 파싱합니다.
 
 // 세션 설정
 const sessionStore = new MySQLStore({
-  host: 'localhost',
-  user: 'root',
-  password: '1234',
-  database: 'tododb',
-  clearExpired: true, // 만료된 세션 데이터를 자동으로 삭제
-  checkExpirationInterval: 10 * 60 * 1000 // 만료된 세션을 확인하는 주기를 10분으로 설정
+  host: 'localhost', // MySQL 호스트 주소를 설정합니다.
+  user: 'root', // MySQL 사용자 이름을 설정합니다.
+  password: '1234', // MySQL 비밀번호를 설정합니다.
+  database: 'tododb', // 사용할 데이터베이스 이름을 설정합니다.
+  clearExpired: true, // 만료된 세션 데이터를 자동으로 삭제할지 여부를 설정합니다.
+  checkExpirationInterval: 10 * 60 * 1000 // 만료된 세션을 확인하는 주기를 설정합니다. (10분)
 });
 app.use(session({
-        secret: 'secret-key',
-        resave: false,
-        saveUninitialized: true,
-        store: sessionStore,
-        cookie: {
-          maxAge: 60 *60 * 1000 // 쿠키 유효 기간 설정(60분)
-        }
-    })
+  secret: 'secret-key', // 세션을 암호화하기 위한 비밀 키를 설정합니다.
+  resave: false, // 세션 데이터를 항상 저장할지 여부를 설정합니다.
+  saveUninitialized: true, // 초기화되지 않은 세션 데이터도 저장할지 여부를 설정합니다.
+  store: sessionStore, // 세션 스토어를 설정합니다.
+  cookie: {
+    maxAge: 60 * 60 * 1000 // 쿠키의 유효 기간을 설정합니다. (60분)
+  }
+})
 );
 
 // MySQL 연결 설정
 const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '1234',
-    database: 'tododb',
+  host: 'localhost', // MySQL 호스트 주소를 설정합니다.
+  user: 'root', // MySQL 사용자 이름을 설정합니다.
+  password: '1234', // MySQL 비밀번호를 설정합니다.
+  database: 'tododb', // 사용할 데이터베이스 이름을 설정합니다.
 });
 db.connect((err) => {
   if (err) {
@@ -121,7 +120,7 @@ app.post('/login', (req, res) => {
 
     const user = results[0];
     req.session.userId = user.id;
-    res.status(200).send('로그인에 성공하였습니다');
+    res.status(200).send(`${user.username}님 환영합니다`);
   });
 });
 
@@ -211,6 +210,7 @@ app.get('/todo', (req, res) => {
     res.status(200).json(results);
   });
 });
+
 
 
 
